@@ -1,0 +1,42 @@
+# task1_movie_genre_classification.py
+# Movie Genre Classification using TF-IDF + Logistic Regression
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, accuracy_score
+
+# Step 1: Load dataset
+# Download dataset & place as 'movie_plots.csv' or adjust filename
+df = pd.read_csv('movie_plots.csv')
+
+print("Data loaded. First few rows:")
+print(df.head())
+
+# Step 2: Check for columns and choose text & label
+# Example: plot = df['Plot'], genre = df['Genre']
+plot = df['Plot']
+genre = df['Genre']
+
+# Step 3: Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    plot, genre, test_size=0.2, random_state=42, stratify=genre)
+
+# Step 4: TF-IDF Vectorization
+vectorizer = TfidfVectorizer(stop_words='english', max_features=5000)
+X_train_tfidf = vectorizer.fit_transform(X_train)
+X_test_tfidf = vectorizer.transform(X_test)
+
+# Step 5: Train Logistic Regression
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train_tfidf, y_train)
+
+# Step 6: Evaluate
+y_pred = model.predict(X_test_tfidf)
+
+print("\n=== Classification Report ===")
+print(classification_report(y_test, y_pred))
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+
+print("\nDone! ✅")
